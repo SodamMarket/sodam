@@ -1,5 +1,6 @@
 # sodam
 Nortion 프로젝트 페이지
+https://www.notion.so/teamtam/09ce4b7b7a704a50ad2be09381810cff
 
 <h1>1. DB</h1>
 <h2>cockroachDB</h2>
@@ -7,7 +8,7 @@ https://www.cockroachlabs.com/docs/stable/install-cockroachdb-windows.html
 
 
 cockroach 시작
-```cockroach start --insecure --host=localhost```
+<pre><code>cockroach start --insecure --host=localhost</pre></code>
 
 <h2>postgreSQL</h2>
 ```go get -u github.com/jackc/pgx```
