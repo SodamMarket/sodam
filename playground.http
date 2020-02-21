@@ -1,0 +1,27 @@
+@Host = http://localhost:3000
+
+
+POST {{Host}}/api/users
+Content-Type: application/json
+
+{
+  "email": "john@example.org",
+  "username": "john"
+}
+
+###############
+
+POST {{Host}}/api/login
+Content-Type: application/json
+
+{
+  "email": "john@example.org"
+}
+
+####################
+GET {{Host}}/api/auth_user
+Authorization: Bearer ATjuJEe4Y0Kt9Vm6wtUhFpnOg12LOR3XUCqJJINDHJJcMdB0REkX7ofgqD675P47aiBBqwkVODLz5tiJ0tYMQ
+
+#######################
+GET {{Host}}/api/auth_user
+Authorization: Bearer {{login.response.body.token}}
