@@ -10,7 +10,7 @@ Content-Type: application/json
 }
 
 ###############
-
+# @name login
 POST {{Host}}/api/login
 Content-Type: application/json
 
@@ -20,7 +20,7 @@ Content-Type: application/json
 
 ####################
 GET {{Host}}/api/auth_user
-Authorization: Bearer ATjuJGBpIY3yuiJjZZHL4EqpSBPTUeHi7e05odXuevTGuLwF1sF0kiO6KbmBt7ecMWezJitZc0dGD7UhfS7ca
+Authorization: Bearer KCBdG7g8BE3HfsAICB8PuoGgDKDGjtFaX234k3eSf7XDW8rvb6qvi1g1l4kscQ
 
 #######################
 GET {{Host}}/api/auth_user

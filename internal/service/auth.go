@@ -28,7 +28,7 @@ type key string
 type LoginOutput struct {
 	Token     string    `json:"token,omitempty"`
 	ExpiresAt time.Time `json:"expires_at,omitempty"`
-	User      User      `json:"user,omitempty"`
+	AuthUser  User      `json:"auth_user,omitempty"`
 }
 
 //AuthUser ID from Token
@@ -57,7 +57,7 @@ func (s *Service) Login(ctx context.Context, email string) (LoginOutput, error) 
 	}
 
 	query := "SELECT id, username FROM users WHERE email = $1"
-	err := s.db.QueryRowContext(ctx, query, email).Scan(&out.User.ID, &out.User.UserName)
+	err := s.db.QueryRowContext(ctx, query, email).Scan(&out.AuthUser.ID, &out.AuthUser.UserName)
 
 	if err == sql.ErrNoRows {
 		return out, ErrUserNotFound
@@ -67,7 +67,7 @@ func (s *Service) Login(ctx context.Context, email string) (LoginOutput, error) 
 		return out, fmt.Errorf("could not query select user: %v\n", err)
 	}
 	//유저 아이디 토큰화
-	out.Token, err = s.codec.EncodeToString(strconv.FormatInt(int64(out.User.ID), 10))
+	out.Token, err = s.codec.EncodeToString(strconv.FormatInt(out.AuthUser.ID, 10))
 	if err != nil {
 		return out, fmt.Errorf("could not query select user: %v\n", err)
 	}
