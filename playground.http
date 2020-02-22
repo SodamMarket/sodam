@@ -20,8 +20,12 @@ Content-Type: application/json
 
 ####################
 GET {{Host}}/api/auth_user
-Authorization: Bearer ATjuJEe4Y0Kt9Vm6wtUhFpnOg12LOR3XUCqJJINDHJJcMdB0REkX7ofgqD675P47aiBBqwkVODLz5tiJ0tYMQ
+Authorization: Bearer ATjuJGBpIY3yuiJjZZHL4EqpSBPTUeHi7e05odXuevTGuLwF1sF0kiO6KbmBt7ecMWezJitZc0dGD7UhfS7ca
 
 #######################
 GET {{Host}}/api/auth_user
+Authorization: Bearer {{login.response.body.token}}
+
+#################
+POST {{Host}}/api/users/jane/toggle_follow
 Authorization: Bearer {{login.response.body.token}}
