@@ -29,15 +29,27 @@ var (
 
 //User Model
 type User struct {
-	ID       int64  `json:"id,omitempty"`
-	UserName string `json:"user_name,omitempty"`
+	ID       int64  `json:"id,omitempty"` //omitempty는 필드에서 값 반환 금지
+	UserName string `json:"user_name"`
+}
+
+//디테일한 유저 구조체
+//Userprofile model.
+type UserProfile struct {
+	User
+	Email          string `json:"email,omitempty"`
+	FollowersCount int    `json:"followers_count"`
+	FolloweesCount int    `json:"followees_count"`
+	Me             bool   `json:"me"`
+	Following      bool   `json:"following"`
+	Followeed      bool   `json:"followeed"`
 }
 
 //팔로워 카운트
 //ToggleFollowOutput response
 type ToggleFollowOutput struct {
-	Following      bool `json:"following,omitempty"`
-	FollowersCount int  `json:"followers_count,omitempty"`
+	Following      bool `json:"following"`
+	FollowersCount int  `json:"followers_count"`
 }
 
 // CreateUser inserts a user int the database.
@@ -71,6 +83,61 @@ func (s *Service) CreateUser(ctx context.Context, email, username string) error 
 	}
 
 	return nil
+}
+
+//유저 프로필
+// User selects on user from the database with the given username.
+func (s *Service) User(ctx context.Context, username string) (UserProfile, error) {
+	var u UserProfile
+
+	//유저 이름 확인
+	//validate the username as well
+	username = strings.TrimSpace(username)
+	if !rxUsername.MatchString(username) {
+		return u, ErrInvalidUsername
+	}
+	//uid와 auth에 요청을 보낸 사람 ID 입력
+	uid, auth := ctx.Value(KeyAuthUserID).(int64)
+
+	//인증된 요청만 처리하도록 조건 설정
+	//only authenticated request && query dynamically
+	args := []interface{}{username}
+	dest := []interface{}{&u.ID, &u.Email, &u.FollowersCount, &u.FolloweesCount}
+	query := "SELECT id, email, followers_count, followees_count "
+	if auth {
+		query += ", " +
+			"followers.follower_id IS NOT NULL AS following, " +
+			"followees.followee_id IS NOT NULL AS followeed "
+		dest = append(dest, &u.Following, &u.Followeed)
+	}
+	query += "FROM users "
+	if auth {
+		query += "LEFT JOIN follows AS followers ON followers.follower_id = $2 AND followers.followee_id = users.id " +
+			"LEFT JOIN follows AS followees ON followees.follower_id = users.id AND followees.followee_id = $2 "
+		args = append(args, uid)
+		dest = append(dest)
+	}
+	query += "WHERE username = $1"
+	err := s.db.QueryRowContext(ctx, query, args...).Scan(dest...)
+
+	if err == sql.ErrNoRows {
+		return u, ErrUserNotFound
+	}
+
+	if err != nil {
+		return u, fmt.Errorf("could not query select user: %v", err)
+	}
+
+	u.UserName = username
+	u.Me = auth && uid == u.ID
+	//만약 요청을 보낸 사람이 인증되지 않은 사용자이거나
+	//본인이 아닐시에는 id와 email 감추기
+	//reset user profile
+	if !u.Me {
+		u.ID = 0
+		u.Email = ""
+	}
+	return u, nil
 }
 
 // 팔로워 이름을 받는 기능

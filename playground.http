@@ -5,8 +5,8 @@ POST {{Host}}/api/users
 Content-Type: application/json
 
 {
-  "email": "john@example.org",
-  "username": "john"
+  "email": "min@example.org",
+  "username": "min"
 }
 
 ###############
@@ -21,6 +21,11 @@ Content-Type: application/json
 ####################
 GET {{Host}}/api/auth_user
 Authorization: Bearer KCBdG7g8BE3HfsAICB8PuoGgDKDGjtFaX234k3eSf7XDW8rvb6qvi1g1l4kscQ
+
+######################
+
+GET {{Host}}/api/users/john
+Authorization: Bearer {{login.response.body.token}}
 
 #######################
 GET {{Host}}/api/auth_user
