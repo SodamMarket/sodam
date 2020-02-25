@@ -24,7 +24,7 @@ Authorization: Bearer KCBdG7g8BE3HfsAICB8PuoGgDKDGjtFaX234k3eSf7XDW8rvb6qvi1g1l4
 
 ######################
 
-GET {{Host}}/api/users/john
+GET {{Host}}/api/users?search=&first=&after=
 Authorization: Bearer {{login.response.body.token}}
 
 #######################

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"sodam/internal/service"
+	"strconv"
 
 	"github.com/matryer/way"
 )
@@ -42,6 +43,22 @@ func (h *handler) createUser(w http.ResponseWriter, r *http.Request) {
 
 //유저 검색 핸들러
 //user search handler
+func (h *handler) users(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query()
+	search := q.Get("search")
+	first, _ := strconv.Atoi(q.Get("first"))
+	after := q.Get("after")
+	uu, err := h.Users(r.Context(), search, first, after)
+	if err != nil {
+		respondError(w, err)
+		return
+	}
+
+	respond(w, uu, http.StatusOK)
+}
+
+//유저 선택 핸들러
+//user select handler
 func (h *handler) user(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	username := way.Param(ctx, "username")
