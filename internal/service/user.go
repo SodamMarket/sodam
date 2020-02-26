@@ -53,6 +53,7 @@ type ToggleFollowOutput struct {
 	FollowersCount int  `json:"followers_count"`
 }
 
+// 유저 생성
 // CreateUser inserts a user int the database.
 func (s *Service) CreateUser(ctx context.Context, email, username string) error {
 	email = strings.TrimSpace(email)
@@ -86,7 +87,7 @@ func (s *Service) CreateUser(ctx context.Context, email, username string) error 
 	return nil
 }
 
-//유저 이름을 오름차순으로 하여 유저 검색
+//유저 이름을 오름차순으로 하여 유저 리스트 생성 및 유저 검색
 //Users in ascending order with forward pagination and filtered by username
 func (s *Service) Users(ctx context.Context, search string, first int, after string) ([]UserProfile, error) {
 	search = strings.TrimSpace(search)
@@ -319,4 +320,148 @@ func (s *Service) ToggleFollow(ctx context.Context, username string) (ToggleFoll
 	}
 
 	return out, nil
+}
+
+//팔로워 이름을 오름차순으로 하여 유저 리스트 생성 및 유저 검색
+//Followers in ascending order with forward pagination and filtered by username
+func (s *Service) Followers(ctx context.Context, username string, first int, after string) ([]UserProfile, error) {
+	username = strings.TrimSpace(username)
+	if !rxUsername.MatchString(username) {
+		return nil, ErrInvalidUsername
+	}
+	first = normailizePageSize(first)
+	after = strings.TrimSpace(after)
+	uid, auth := ctx.Value(KeyAuthUserID).(int64)
+	//인증된 유저의 요청만 처리하도록 하는 기능
+	//USer()와 다른 방식 - go template
+	query, args, err := buildQuery(`
+	SELECT id, email, username, followers_count, followees_count
+	{{if .auth}}
+	, followers.follower_id IS NOT NULL AS following
+	, followees.followee_id IS NOT NULL AS followeed
+	{{end}}
+	FROM follows
+	INNER JOIN users ON follows.follower_id = users.id
+	{{if .auth}}
+	LEFT JOIN follows AS followers ON followers.follower_id = @uid AND followers.followee_id = users.id
+	LEFT JOIN follows AS followees ON followees.follower_id = users.id AND followees.followee_id = @uid
+	{{end}}
+	WHERE follows.followee_id = (SELECT id FROM users WHERE username = @username)
+	{{if .after}}AND username > @after{{end}}
+	ORDER BY username ASC
+	LIMIT @first`, map[string]interface{}{
+		"auth":     auth,
+		"uid":      uid,
+		"username": username,
+		"first":    first,
+		"after":    after,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("could not build followers sql query: %v", err)
+	}
+
+	log.Printf("users query: %s\nargs: %v\n", query, args)
+
+	rows, err := s.db.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("could not query select followers: %v", err)
+	}
+
+	defer rows.Close()
+	uu := make([]UserProfile, 0, first)
+	for rows.Next() {
+		var u UserProfile
+		dest := []interface{}{&u.ID, &u.Email, &u.UserName, &u.FollowersCount, &u.FolloweesCount}
+		if auth {
+			dest = append(dest, &u.Following, &u.Followeed)
+		}
+		if err = rows.Scan(dest...); err != nil {
+			return nil, fmt.Errorf("could not scan follower: %v", err)
+		}
+
+		u.Me = auth && uid == u.ID
+		if !u.Me {
+			u.ID = 0
+			u.Email = ""
+		}
+		uu = append(uu, u)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("could not iterate follower rows: %v", err)
+	}
+
+	return uu, nil
+}
+
+//팔로잉한 사람 이름을 오름차순으로 하여 유저 리스트 생성 및 유저 검색
+//Followees in ascending order with forward pagination and filtered by username
+func (s *Service) Followees(ctx context.Context, username string, first int, after string) ([]UserProfile, error) {
+	username = strings.TrimSpace(username)
+	if !rxUsername.MatchString(username) {
+		return nil, ErrInvalidUsername
+	}
+	first = normailizePageSize(first)
+	after = strings.TrimSpace(after)
+	uid, auth := ctx.Value(KeyAuthUserID).(int64)
+	//인증된 유저의 요청만 처리하도록 하는 기능
+	//USer()와 다른 방식 - go template
+	query, args, err := buildQuery(`
+	SELECT id, email, username, followers_count, followees_count
+	{{if .auth}}
+	, followers.follower_id IS NOT NULL AS following
+	, followees.followee_id IS NOT NULL AS followeed
+	{{end}}
+	FROM follows
+	INNER JOIN users ON follows.followee_id = users.id
+	{{if .auth}}
+	LEFT JOIN follows AS followers ON followers.follower_id = @uid AND followers.followee_id = users.id
+	LEFT JOIN follows AS followees ON followees.follower_id = users.id AND followees.followee_id = @uid
+	{{end}}
+	WHERE follows.follower_id = (SELECT id FROM users WHERE username = @username)
+	{{if .after}}AND username > @after{{end}}
+	ORDER BY username ASC
+	LIMIT @first`, map[string]interface{}{
+		"auth":     auth,
+		"uid":      uid,
+		"username": username,
+		"first":    first,
+		"after":    after,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("could not build followees sql query: %v", err)
+	}
+
+	log.Printf("users query: %s\nargs: %v\n", query, args)
+
+	rows, err := s.db.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("could not query select followees: %v", err)
+	}
+
+	defer rows.Close()
+	uu := make([]UserProfile, 0, first)
+	for rows.Next() {
+		var u UserProfile
+		dest := []interface{}{&u.ID, &u.Email, &u.UserName, &u.FollowersCount, &u.FolloweesCount}
+		if auth {
+			dest = append(dest, &u.Following, &u.Followeed)
+		}
+		if err = rows.Scan(dest...); err != nil {
+			return nil, fmt.Errorf("could not scan followee: %v", err)
+		}
+
+		u.Me = auth && uid == u.ID
+		if !u.Me {
+			u.ID = 0
+			u.Email = ""
+		}
+		uu = append(uu, u)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("could not iterate followee rows: %v", err)
+	}
+
+	return uu, nil
 }
