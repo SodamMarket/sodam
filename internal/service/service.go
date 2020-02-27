@@ -8,14 +8,16 @@ import (
 
 // 서비스 핵심 로직. REST, GraphQL, RPC API 등 원하는거 사용
 type Service struct {
-	db    *sql.DB
-	codec *branca.Branca
+	db     *sql.DB
+	codec  *branca.Branca
+	origin string
 }
 
 //DB와 Codec 생성자
-func New(db *sql.DB, codec *branca.Branca) *Service {
+func New(db *sql.DB, codec *branca.Branca, origin string) *Service {
 	return &Service{
-		db:    db,
-		codec: codec,
+		db:     db,
+		codec:  codec,
+		origin: origin,
 	}
 }

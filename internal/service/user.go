@@ -5,15 +5,32 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"image"
+	"image/jpeg"
+	"image/png"
+	"io"
 	"log"
+	"os"
+	"path"
 	"regexp"
 	"strings"
+
+	"github.com/disintegration/imaging"
+	gonanoid "github.com/matoous/go-nanoid"
 )
+
+// 아바타 용량 제한
+// MaxAvatarBytes to read
+const MaxAvatarBytes = 5 << 20 //5MB
 
 var (
 	//이메일 및 이름 확인(정규식 사용)
 	rxEmail    = regexp.MustCompile("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")
 	rxUsername = regexp.MustCompile("^[a-zA-Z][a-zA-Z0-9_-]{0,17}$")
+	avatarsDir = path.Join("web", "static", "img", "avatars")
+)
+
+var (
 	// ErrUserNotFound used when the user wasn't found on the db.
 	ErrUserNotFound = errors.New("user not found")
 	// ErrInvalidEmail used when the mail. is not valid
@@ -26,12 +43,15 @@ var (
 	ErrUsernameTaken = errors.New("username taken")
 	// ErrForbiddenFollow is used when you try to following yourself
 	ErrForbiddenFollow = errors.New("cannot follow yourself")
+	// ErrUnsupportedAvatarFormat used for unsupported avatar format.
+	ErrUnsupportedAvatarFormat = errors.New("only png and jpeg allowed as avatar")
 )
 
 //User Model
 type User struct {
-	ID       int64  `json:"id,omitempty"` //omitempty는 필드에서 값 반환 금지
-	UserName string `json:"user_name"`
+	ID        int64   `json:"id,omitempty"` //omitempty는 필드에서 값 반환 금지
+	UserName  string  `json:"user_name"`
+	AvatarURL *string `json:"avatarUrl"`
 }
 
 //디테일한 유저 구조체
@@ -97,7 +117,7 @@ func (s *Service) Users(ctx context.Context, search string, first int, after str
 	//인증된 유저의 요청만 처리하도록 하는 기능
 	//USer()와 다른 방식 - go template
 	query, args, err := buildQuery(`
-	SELECT id, email, username, followers_count, followees_count
+	SELECT id, email, username, avatar followers_count, followees_count
 	{{if .auth}}
 	, followers.follower_id IS NOT NULL AS following
 	, followees.followee_id IS NOT NULL AS followeed
@@ -134,7 +154,8 @@ func (s *Service) Users(ctx context.Context, search string, first int, after str
 	uu := make([]UserProfile, 0, first)
 	for rows.Next() {
 		var u UserProfile
-		dest := []interface{}{&u.ID, &u.Email, &u.UserName, &u.FollowersCount, &u.FolloweesCount}
+		var avatar sql.NullString
+		dest := []interface{}{&u.ID, &u.Email, &u.UserName, &avatar, &u.FollowersCount, &u.FolloweesCount}
 		if auth {
 			dest = append(dest, &u.Following, &u.Followeed)
 		}
@@ -147,6 +168,10 @@ func (s *Service) Users(ctx context.Context, search string, first int, after str
 			u.ID = 0
 			u.Email = ""
 		}
+		if avatar.Valid {
+			avatarURL := s.origin + "/img/avatars/" + avatar.String
+			u.AvatarURL = &avatarURL
+		}
 		uu = append(uu, u)
 	}
 
@@ -157,7 +182,7 @@ func (s *Service) Users(ctx context.Context, search string, first int, after str
 	return uu, nil
 }
 
-//유저 프로필
+// 유저 프로필
 // User selects on user from the database with the given username.
 func (s *Service) User(ctx context.Context, username string) (UserProfile, error) {
 	var u UserProfile
@@ -173,9 +198,10 @@ func (s *Service) User(ctx context.Context, username string) (UserProfile, error
 
 	//인증된 요청만 처리하도록 조건 설정
 	//only authenticated request && query dynamically
+	var avatar sql.NullString
 	args := []interface{}{username}
-	dest := []interface{}{&u.ID, &u.Email, &u.FollowersCount, &u.FolloweesCount}
-	query := "SELECT id, email, followers_count, followees_count "
+	dest := []interface{}{&u.ID, &u.Email, &avatar, &u.FollowersCount, &u.FolloweesCount}
+	query := "SELECT id, email, avatar, followers_count, followees_count "
 	if auth {
 		query += ", " +
 			"followers.follower_id IS NOT NULL AS following, " +
@@ -209,7 +235,83 @@ func (s *Service) User(ctx context.Context, username string) (UserProfile, error
 		u.ID = 0
 		u.Email = ""
 	}
+	if avatar.Valid {
+		avatarURL := s.origin + "/img/avatars/" + avatar.String
+		u.AvatarURL = &avatarURL
+	}
 	return u, nil
+}
+
+// 아바타 생성
+// UpdateAvatar of the authenticated user returning the new avatar URL
+func (s *Service) UpdateAvatar(ctx context.Context, r io.Reader) (string, error) {
+	// 유저 확인
+	// checking authentication
+	uid, ok := ctx.Value(KeyAuthUserID).(int64)
+	if !ok {
+		return "", ErrUnauthenticated
+	}
+
+	// 아바타 용량 제한, 형식 제한
+	r = io.LimitReader(r, MaxAvatarBytes)
+	img, format, err := image.Decode(r)
+	if err != nil {
+		return "", fmt.Errorf("could not read avatar: %v", err)
+	}
+
+	if format != "png" && format != "jpeg" {
+		return "", ErrUnsupportedAvatarFormat
+	}
+
+	// 유저 이름에 맞는 아바타 자동 생성
+	avatar, err := gonanoid.Nanoid()
+	if err != nil {
+		return "", fmt.Errorf("could not generate avatar filename: %v", err)
+	}
+
+	// 추가한 아바타 사진 이름에 형식 추가
+	if format == "png" {
+		avatar += ".png"
+	} else {
+		avatar += ".jpg"
+	}
+
+	// 아바타 사진이 저정된 경로 불러오기
+	avatarPath := path.Join(avatarsDir, avatar)
+	f, err := os.Create(avatarPath)
+	if err != nil {
+		return "", fmt.Errorf("could not create avatar: %v", err)
+	}
+
+	// 이미지 크기 변환
+	defer f.Close()
+	img = imaging.Fill(img, 400, 400, imaging.Center, imaging.CatmullRom)
+
+	if format == "png" {
+		err = png.Encode(f, img)
+	} else {
+		err = jpeg.Encode(f, img, nil)
+	}
+
+	if err != nil {
+		return "", fmt.Errorf("could not write avatar for disk: %v", err)
+	}
+
+	var oldAvatar sql.NullString
+
+	//새로운 아바타가 업데이트 됐을 때 기존의 아바타 사진을 자동으로 지움
+	if err = s.db.QueryRowContext(ctx, `
+		UPDATE users SET avatar = $1 WHERE id = $2
+		RETURNING (SELECT avatar FROM users WHERE id = $2) AS old_avatar`, avatar, uid).Scan(&oldAvatar); err != nil {
+		defer os.Remove(avatarPath)
+		return "", fmt.Errorf("could not update avatar: %v", err)
+	}
+
+	if oldAvatar.Valid {
+		defer os.Remove(path.Join(avatarsDir, oldAvatar.String))
+	}
+
+	return s.origin + "/img/avatars/" + avatar, nil
 }
 
 // 팔로워 이름을 받는 기능
@@ -335,7 +437,7 @@ func (s *Service) Followers(ctx context.Context, username string, first int, aft
 	//인증된 유저의 요청만 처리하도록 하는 기능
 	//USer()와 다른 방식 - go template
 	query, args, err := buildQuery(`
-	SELECT id, email, username, followers_count, followees_count
+	SELECT id, email, username, avatar, followers_count, followees_count
 	{{if .auth}}
 	, followers.follower_id IS NOT NULL AS following
 	, followees.followee_id IS NOT NULL AS followeed
@@ -371,7 +473,8 @@ func (s *Service) Followers(ctx context.Context, username string, first int, aft
 	uu := make([]UserProfile, 0, first)
 	for rows.Next() {
 		var u UserProfile
-		dest := []interface{}{&u.ID, &u.Email, &u.UserName, &u.FollowersCount, &u.FolloweesCount}
+		var avatar sql.NullString
+		dest := []interface{}{&u.ID, &u.Email, &u.UserName, &avatar, &u.FollowersCount, &u.FolloweesCount}
 		if auth {
 			dest = append(dest, &u.Following, &u.Followeed)
 		}
@@ -383,6 +486,10 @@ func (s *Service) Followers(ctx context.Context, username string, first int, aft
 		if !u.Me {
 			u.ID = 0
 			u.Email = ""
+		}
+		if avatar.Valid {
+			avatarURL := s.origin + "/img/avatars/" + avatar.String
+			u.AvatarURL = &avatarURL
 		}
 		uu = append(uu, u)
 	}
@@ -407,7 +514,7 @@ func (s *Service) Followees(ctx context.Context, username string, first int, aft
 	//인증된 유저의 요청만 처리하도록 하는 기능
 	//USer()와 다른 방식 - go template
 	query, args, err := buildQuery(`
-	SELECT id, email, username, followers_count, followees_count
+	SELECT id, email, username, avatar followers_count, followees_count
 	{{if .auth}}
 	, followers.follower_id IS NOT NULL AS following
 	, followees.followee_id IS NOT NULL AS followeed
@@ -443,7 +550,8 @@ func (s *Service) Followees(ctx context.Context, username string, first int, aft
 	uu := make([]UserProfile, 0, first)
 	for rows.Next() {
 		var u UserProfile
-		dest := []interface{}{&u.ID, &u.Email, &u.UserName, &u.FollowersCount, &u.FolloweesCount}
+		var avatar sql.NullString
+		dest := []interface{}{&u.ID, &u.Email, &u.UserName, &avatar, &u.FollowersCount, &u.FolloweesCount}
 		if auth {
 			dest = append(dest, &u.Following, &u.Followeed)
 		}
@@ -455,6 +563,10 @@ func (s *Service) Followees(ctx context.Context, username string, first int, aft
 		if !u.Me {
 			u.ID = 0
 			u.Email = ""
+		}
+		if avatar.Valid {
+			avatarURL := s.origin + "/img/avatars/" + avatar.String
+			u.AvatarURL = &avatarURL
 		}
 		uu = append(uu, u)
 	}

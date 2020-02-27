@@ -28,8 +28,16 @@ GET {{Host}}/api/users?search=jane&first=&after=
 Authorization: Bearer {{login.response.body.token}}
 
 #######################
-GET {{Host}}/api/auth_user
+GET {{Host}}/api/users/john
 Authorization: Bearer {{login.response.body.token}}
+
+###
+
+PUT {{Host}}/api/auth_user/avatar
+Authorization: Bearer {{login.response.body.token}}
+Content-Type: image/png
+
+< asset/sample.jpg
 
 #################
 POST {{Host}}/api/users/jane/toggle_follow
