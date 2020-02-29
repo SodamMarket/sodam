@@ -40,7 +40,7 @@ Content-Type: image/png
 < asset/sample.jpg
 
 #################
-POST {{Host}}/api/users/jane/toggle_follow
+POST {{Host}}/api/users/john/toggle_follow
 Authorization: Bearer {{login.response.body.token}}
 
 ###
@@ -51,3 +51,11 @@ Authorization: Bearer {{login.response.body.token}}
 GET {{Host}}/api/users/john/followees?first=&after=
 Authorization: Bearer {{login.response.body.token}}
 
+###
+POST {{Host}}/api/posts
+Authorization: Bearer {{login.response.body.token}}
+Content-Type: application/json
+
+{
+  "content": "new post"
+}
