@@ -57,5 +57,7 @@ Authorization: Bearer {{login.response.body.token}}
 Content-Type: application/json
 
 {
-  "content": "new post"
+  "content": "new new post",
+  "spoilerOf": "show name here",
+  "nsfw": true
 }

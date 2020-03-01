@@ -11,6 +11,8 @@ import (
 	"github.com/sanity-io/litter"
 )
 
+// 에러문
+// Error
 var (
 	// ErrInvalidContent is used for invalid content.
 	ErrInvalidContent = errors.New("invalid content")
@@ -18,6 +20,7 @@ var (
 	ErrInvalidSpoiler = errors.New("invalid spoiler")
 )
 
+// 게시물 모델
 // Post model
 type Post struct {
 	ID        int64     `json:"id,"`
