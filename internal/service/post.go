@@ -18,6 +18,8 @@ var (
 	ErrInvalidContent = errors.New("invalid content")
 	// ErrInvalidSpoiler is used for invalid spoiler.
 	ErrInvalidSpoiler = errors.New("invalid spoiler")
+	// ErrPostNotFound denotes a post that was not found
+	ErrPostNotFound = errors.New("post not found")
 )
 
 // 게시물 모델
@@ -33,6 +35,12 @@ type Post struct {
 	Mine      bool      `json:"mine,"`
 }
 
+type ToggleLikeOutput struct {
+	Liked      bool `json:"liked,"`
+	LikesCount int  `json:"likescount,"`
+}
+
+// 게시물 생성 및 타임라인에 게시물 표시
 // CreatedPost publishes a post the user timeline and fan-outs it to his followers.
 func (s *Service) CreatePost(ctx context.Context, content string, spoilerOf *string, nsfw bool) (TimelineItem, error) {
 	var ti TimelineItem
@@ -142,4 +150,70 @@ func (s *Service) fanoutPost(p Post) ([]TimelineItem, error) {
 	}
 
 	return tt, nil
+}
+
+// 글 좋아요 기능
+// TogllePostLike
+func (s *Service) TogglePostLike(ctx context.Context, postID int64) (ToggleLikeOutput, error) {
+	var out ToggleLikeOutput
+	uid, ok := ctx.Value(KeyAuthUserID).(int64)
+
+	if !ok {
+		return out, ErrUnauthenticated
+	}
+
+	tx, err := s.db.BeginTx(ctx, nil)
+
+	if err != nil {
+		return out, fmt.Errorf("could not begin tx: %v", err)
+	}
+
+	defer tx.Rollback()
+
+	query := `
+		SELECT EXISTS (
+			SELECT 1 FROM post_likes WHERE user_id = $1 AND post_id = $2
+		)`
+
+	if err = tx.QueryRowContext(ctx, query, uid, postID).Scan(&out.Liked); err != nil {
+		return out, fmt.Errorf("could not query select post like existence : %v", err)
+	}
+
+	//좋아요 취소 기능(두번 좋아요 했을시)
+	if out.Liked {
+		query = "DELETE FROM post_likes WHERE user_id = $1 AND post_id = $2"
+		if _, err = tx.ExecContext(ctx, query, uid, postID); err != nil {
+			return out, fmt.Errorf("could not delete post like: %v", err)
+		}
+
+		query = "UPDATE posts SET likes_count = likes_count - 1 WHERE id = $1 RETURNING likes_count"
+		if err = tx.QueryRowContext(ctx, query, postID).Scan(&out.LikesCount); err != nil {
+			return out, fmt.Errorf("could not update and decrement post likes count: %v", err)
+		}
+	} else {
+		//좋아요 기능
+		query = "INSERT INTO post_likes (user_id, post_id) VALUES ($1, $2)"
+		_, err = tx.ExecContext(ctx, query, uid, postID)
+
+		if isForeignKeyViolation(err) {
+			return out, ErrPostNotFound
+		}
+
+		if err != nil {
+			return out, fmt.Errorf("could not insert post like: %v", err)
+		}
+
+		query = "UPDATE posts SET likes_count = likes_count + 1 WHERE id = $1 RETURNING likes_count"
+		if err = tx.QueryRowContext(ctx, query, postID).Scan(&out.LikesCount); err != nil {
+			return out, fmt.Errorf("could not update and increment post likes count: %v", err)
+		}
+	}
+
+	if err = tx.Commit(); err != nil {
+		return out, fmt.Errorf("could not commit to toggle post like: %v", err)
+	}
+
+	out.Liked = !out.Liked
+
+	return out, nil
 }

@@ -117,7 +117,7 @@ func (s *Service) Users(ctx context.Context, search string, first int, after str
 	//인증된 유저의 요청만 처리하도록 하는 기능
 	//USer()와 다른 방식 - go template
 	query, args, err := buildQuery(`
-	SELECT id, email, username, avatar followers_count, followees_count
+	SELECT id, email, username, avatar, followers_count, followees_count
 	{{if .auth}}
 	, followers.follower_id IS NOT NULL AS following
 	, followees.followee_id IS NOT NULL AS followeed

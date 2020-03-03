@@ -20,11 +20,11 @@ Content-Type: application/json
 
 ####################
 GET {{Host}}/api/auth_user
-Authorization: Bearer KCBdG7g8BE3HfsAICB8PuoGgDKDGjtFaX234k3eSf7XDW8rvb6qvi1g1l4kscQ
+Authorization: Bearer KCBhlZ4bTKqgFLGbKKJdJX7y1LToB2TBNEhoEoGi7wjoIXch4f24XsQHlDMWCy
 
 ######################
 
-GET {{Host}}/api/users?search=jane&first=&after=
+GET {{Host}}/api/users?search=&first=&after=
 Authorization: Bearer {{login.response.body.token}}
 
 #######################
@@ -40,15 +40,15 @@ Content-Type: image/png
 < asset/sample.jpg
 
 #################
-POST {{Host}}/api/users/john/toggle_follow
+POST {{Host}}/api/users/jane/toggle_follow
 Authorization: Bearer {{login.response.body.token}}
 
 ###
-GET {{Host}}/api/users/jane/followers?first=&after=
+GET {{Host}}/api/users/john/followers?first=&after=
 Authorization: Bearer {{login.response.body.token}}
 
 ###
-GET {{Host}}/api/users/john/followees?first=&after=
+GET {{Host}}/api/users/jane/followees?first=&after=
 Authorization: Bearer {{login.response.body.token}}
 
 ###
@@ -61,3 +61,7 @@ Content-Type: application/json
   "spoilerOf": "show name here",
   "nsfw": true
 }
+
+###
+POST {{Host}}/api/posts/8/toggle_like
+Authorization: Bearer {{login.response.body.token}}

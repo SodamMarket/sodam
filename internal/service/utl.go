@@ -22,6 +22,11 @@ func isUniqueViolation(err error) bool {
 	return ok && pgerr.Code == "23505"
 }
 
+func isForeignKeyViolation(err error) bool {
+	pgerr, ok := err.(*pgconn.PgError)
+	return ok && pgerr.Code == "23503"
+}
+
 //쿼리문을 보충해주는 기능
 func buildQuery(text string, data map[string]interface{}) (string, []interface{}, error) {
 	//캐싱하여 템플릿 파싱
