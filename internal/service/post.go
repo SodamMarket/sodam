@@ -25,19 +25,21 @@ var (
 // 게시물 모델
 // Post model
 type Post struct {
-	ID        int64     `json:"id,"`
-	UserID    int64     `json:"userid,"`
-	Content   string    `json:"content,"`
-	SpoilerOf *string   `json:"spoiler_of,"`
-	NSFW      bool      `json:"nsfw,"`
-	CreatedAt time.Time `json:"created_at,"`
-	User      *User     `json:"user,omitempty"`
-	Mine      bool      `json:"mine,"`
+	ID         int64     `json:"id,"`
+	UserID     int64     `json:"userid,"`
+	Content    string    `json:"content,"`
+	SpoilerOf  *string   `json:"spoiler_of,"`
+	NSFW       bool      `json:"nsfw,"`
+	LikesCount int       `json:"likesCount,"`
+	CreatedAt  time.Time `json:"created_at,"`
+	User       *User     `json:"user,omitempty"`
+	Mine       bool      `json:"mine,"`
+	Liked      bool      `json:"liked,"`
 }
 
 type ToggleLikeOutput struct {
 	Liked      bool `json:"liked,"`
-	LikesCount int  `json:"likescount,"`
+	LikesCount int  `json:"likesCount,"`
 }
 
 // 게시물 생성 및 타임라인에 게시물 표시
@@ -150,6 +152,80 @@ func (s *Service) fanoutPost(p Post) ([]TimelineItem, error) {
 	}
 
 	return tt, nil
+}
+
+// 게시글 내림차순 정렬 및 페이지(한 페이지에 몇개의 글이 보일 건지) 설정
+// Posts from a user in descending order and with backward pagination.
+func (s *Service) Posts(
+	ctx context.Context,
+	username string,
+	last int,
+	before int64) ([]Post, error) {
+	username = strings.TrimSpace(username)
+	if !rxUsername.MatchString(username) {
+		return nil, ErrInvalidUsername
+	}
+
+	uid, auth := ctx.Value(KeyAuthUserID).(int64)
+	last = normailizePageSize(last)
+
+	query, args, err := buildQuery(`
+		SELECT id, content, spoiler_of, nsfw, likes_count, created_at
+		{{if .auth}}
+		, posts.user_id = @uid AS mine
+		, likes.user_id IS NOT NULL AS liked
+		{{end}}
+		FROM posts
+		{{if .auth}}
+		LEFT JOIN post_likes AS likes
+			ON likes.user_id = @uid AND likes.post_id = posts.id
+		{{end}}
+		WHERE posts.user_id = (SELECT id FROM users WHERE username = @username)
+		{{if .before}}AND posts.id < @before{{end}}
+		ORDER BY created_at DESC
+		LIMIT @last
+	`, map[string]interface{}{
+		"auth":     auth,
+		"uid":      uid,
+		"username": username,
+		"last":     last,
+		"before":   before,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("could not build posts sql query: %v", err)
+	}
+
+	rows, err := s.db.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("could not query select posts: %v", err)
+	}
+
+	defer rows.Close()
+
+	pp := make([]Post, 0, last)
+	for rows.Next() {
+		var p Post
+		dest := []interface{}{&p.ID, &p.Content, &p.SpoilerOf, &p.NSFW, &p.LikesCount, &p.CreatedAt}
+		if auth {
+			dest = append(dest, &p.Mine, &p.Liked)
+		}
+
+		if err = rows.Scan(dest...); err != nil {
+			return nil, fmt.Errorf("could not scan post: %v", err)
+		}
+
+		if err = rows.Scan(dest...); err != nil {
+			return nil, fmt.Errorf("could not scan post: %v", err)
+		}
+
+		pp = append(pp, p)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("could not iterate posts rows: %v", err)
+	}
+
+	return pp, nil
 }
 
 // 글 좋아요 기능
