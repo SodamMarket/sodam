@@ -61,6 +61,23 @@ func (h *handler) posts(w http.ResponseWriter, r *http.Request) {
 	respond(w, pp, http.StatusOK)
 }
 
+func (h *handler) post(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	postID, _ := strconv.ParseInt(way.Param(ctx, "post_id"), 10, 64)
+	p, err := h.Post(ctx, postID)
+	if err == service.ErrPostNotFound {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	if err != nil {
+		respondError(w, err)
+		return
+	}
+
+	respond(w, p, http.StatusOK)
+}
+
 func (h *handler) togglePostLike(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	postID, _ := strconv.ParseInt(way.Param(ctx, "post_id"), 10, 64)

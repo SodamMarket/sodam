@@ -67,5 +67,13 @@ GET {{Host}}/api/users/john/posts?last=3&before=
 Authorization: Bearer {{login.response.body.token}}
 
 ###
-POST {{Host}}/api/posts/8/toggle_like
+GET {{Host}}/api/posts/3
+Authorization: Bearer {{login.response.body.token}}
+
+###
+POST {{Host}}/api/posts/1/toggle_like
+Authorization: Bearer {{login.response.body.token}}
+
+###
+GET {{Host}}/api/timeline?last=&before=535259992687443969
 Authorization: Bearer {{login.response.body.token}}
