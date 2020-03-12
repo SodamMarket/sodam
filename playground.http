@@ -75,5 +75,5 @@ POST {{Host}}/api/posts/1/toggle_like
 Authorization: Bearer {{login.response.body.token}}
 
 ###
-GET {{Host}}/api/timeline?last=&before=535259992687443969
+GET {{Host}}/api/timeline?last=&before=
 Authorization: Bearer {{login.response.body.token}}

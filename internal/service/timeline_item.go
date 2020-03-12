@@ -12,6 +12,7 @@ type TimelineItem struct {
 	UserID int64 `json:"-"`
 	PostID int64 `json:"-"`
 	Post   Post  `json:"post"`
+	buyer  string
 }
 
 // Timeline
@@ -71,6 +72,7 @@ func (s *Service) Timeline(
 			&ti.Post.CreatedAt,
 			&ti.Post.Mine,
 			&ti.Post.Liked,
+			&ti.preID,
 			&u.UserName,
 			&avatar}
 
