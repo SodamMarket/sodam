@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no"
+    />
+    <title>소담 마켓</title>
+    <link rel="stylesheet" type="text/css" href="css/reset.css" />
+    <link rel="stylesheet" type="text/css" href="css/base.css" />
+    <link rel="stylesheet" type="text/css" href="css/main.css" />
+    <link rel="stylesheet" type="text/css" href="css/mediaquery.css" />
+    <link rel="stylesheet" href="./css/jquery.bxslider.css" />
+    <link rel="shortcut icon" href="images/main/sodam-logo.png" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://use.fontawesome.com/d3b29147de.js"></script>
+    <script src="js/jquery.bxslider.min.js"></script>
+    <script src="js/bpopup.js"></script>
+    <script type="text/javascript" src="js/action.js"></script>
+  </head>
+  <body>
+    <div id="skipNavi">
+      <a href="#mainVisual" class="skip">본문바로가기</a>
+      <a href="#lnb" class="skip">주메뉴바로가기</a>
+    </div>
+    <!-- header -->
+    <header>
+      <div class="Wrap">
+        <ul id="gnb">
+          <li><a href="#" title="로그인" class="login_popup">로그인</a></li>
+          <li><a href="./signup.html" title="회원가입">회원가입</a></li>
+          <li><a href="#" title="배송지역 검색">배송지역 검색</a></li>
+        </ul>
+        <h1><a href="./index.html"> <img src="images/main/sodam-logo.png" alt="소담마켓" /></a></h1>
+      </div>
+    </header>
+    <!-- header end -->
+    <!-- navigation -->
+    <nav>
+      <h2>메뉴1</h2>
+      <div class="Wrap">
+        <label for="navTrigger" class="navHamburger"
+          ><img src="images/common/hamburger.png" alt="모바일 메뉴"
+        /></label>
+        <input type="checkbox" id="navTrigger" />
+        <div class="blackBox"></div>
+        <ul id="lnb">
+          <li>
+            <label for="navTrigger" class="navClose" style="text-align:right; cursor:pointer;"
+              ><img src="images/common/nav-close.png" alt="모바일 메뉴 닫기"
+            /></label>
+          </li>
+          <li class="pupleColor">
+            <a href="#" title="전체 카테고리 ">전체 카테고리</a>
+            <ul>
+              <li><a href="#">채소/과일/곡류</a></li>
+              <li><a href="#">수산</a></li>
+              <li><a href="#">정육/달걀</a></li>
+              <li><a href="#">반찬</a></li>
+              <li><a href="#">간편식</a></li>
+              <li><a href="#">면/양념/오일</a></li>
+              <li><a href="#">음료/우유/간식</a></li>
+              <li><a href="#">치즈/델리/베이커리 </a></li>
+              <li><a href="#">헬스/뷰티</a></li>
+              <li><a href="#">리빙</a></li>
+              <li><a href="#">유아동</a></li>
+              <li><a href="#">브랜드관</a></li>
+              <li><a href="#">MD의 큐레이션</a></li>
+            </ul>
+          </li>
+          <li><a href="newproduct.html" title="신상품">신상품</a></li>
+          <li><a href="popular_product.html" title="인기상품">인기상품</a></li>
+          <li><a href="sale_product.html" title="알뜰쇼핑">알뜰쇼핑</a></li>
+          <li><a href="#" title="이벤트">이벤트</a></li>
+          <li id="mobileShow">
+            <a href="member.html" title="로그인 | 회원가입">로그인 | 회원가입 </a>
+          </li>
+        </ul>
+        <!-- sub menu -->
+        <div class="lnb_sub">
+          <div class="inner_lnbsub">
+            <div class="fruit">
+              <a href="#">
+                <span class="imgChange01"
+                  ><img src="./images/common/nav01_fruite.png" alt="채소/과일/곡류 이미지"
+                /></span>
+                <span>채소/과일/곡류 </span></a
+              >
+              <ul>
+                <li><a href="#">채소</a></li>
+                <li><a href="#">과일</a></li>
+                <li><a href="#">쌀/잡곡</a></li>
+                <li><a href="#">견과류</a></li>
+              </ul>
+            </div>
+            <div class="fish">
+              <a href="#">
+                <span><img src="./images/common/nav02_fish.png" alt="채소/과일/곡류 이미지"/></span>
+                <span>수산 </span></a
+              >
+              <ul>
+                <li><a href="#">생선</a></li>
+                <li><a href="#">해산물/조개류</a></li>
+                <li><a href="#">김/해조류</a></li>
+                <li><a href="#">건어물</a></li>
+                <li><a href="#">수산가공품</a></li>
+              </ul>
+            </div>
+            <div class="meat">
+              <a href="#">
+                <span><img src="./images/common/nav03_meat.png" alt="채소/과일/곡류 이미지"/></span>
+                <span>정육/달걀 </span></a
+              >
+              <ul>
+                <li><a href="#">소고기</a></li>
+                <li><a href="#">돼지고기</a></li>
+                <li><a href="#">닭/오리고기</a></li>
+                <li><a href="#">달걀</a></li>
+                <li><a href="#">양고기</a></li>
+                <li><a href="#">양념육/돈까스</a></li>
+              </ul>
+            </div>
+            <div class="sidedish">
+              <a href="#">
+                <span
+                  ><img src="./images/common/nav04_sidedish.png" alt="채소/과일/곡류 이미지"
+                /></span>
+                <span>반찬 </span></a
+              >
+              <ul>
+                <li><a href="#">샐러드</a></li>
+                <li><a href="#">김치</a></li>
+                <li><a href="#">밑반찬</a></li>
+                <li><a href="#">국/찌개/탕/죽</a></li>
+                <li><a href="#">메인요리</a></li>
+              </ul>
+            </div>
+            <div class="retrofood">
+              <a href="#">
+                <span
+                  ><img src="./images/common/nav05_retro.png" alt="채소/과일/곡류 이미지"
+                /></span>
+                <span>간편식 </span></a
+              >
+              <ul>
+                <li><a href="#">한끼대용</a></li>
+                <li><a href="#">두부/어묵</a></li>
+                <li><a href="#">햄/소시지/통조림</a></li>
+                <li><a href="#">면/즉석밥/볶음밥</a></li>
+                <li><a href="#">국/찌개/탕/죽</a></li>
+                <li><a href="#">만두/메인요리</a></li>
+              </ul>
+            </div>
+            <div class="pastaNoil">
+              <a href="#">
+                <span
+                  ><img src="./images/common/nav06_seasoning.png" alt="채소/과일/곡류 이미지"
+                /></span>
+                <span>면/양념/오일 </span></a
+              >
+              <ul>
+                <li><a href="#">파스타/면</a></li>
+                <li><a href="#">밀가루/믹스</a></li>
+                <li><a href="#">장/식초/양념</a></li>
+                <li><a href="#">향신료/소스</a></li>
+                <li><a href="#">올리브오일/기름</a></li>
+              </ul>
+            </div>
+            <div class="beverage">
+              <a href="#">
+                <span
+                  ><img src="./images/common/nav07_bottle.png" alt="채소/과일/곡류 이미지"
+                /></span>
+                <span>음료/우유/간식 </span></a
+              >
+              <ul>
+                <li><a href="#">물/음료/주스</a></li>
+                <li><a href="#">차/커피</a></li>
+                <li><a href="#">우유/두유/유제품</a></li>
+                <li><a href="#">아이스크림</a></li>
+                <li><a href="#">스낵/초콜릿/시리얼</a></li>
+                <li><a href="#">떡/한과</a></li>
+              </ul>
+            </div>
+            <div class="cheese">
+              <a href="#">
+                <span
+                  ><img src="./images/common/nav08_cheese.png" alt="채소/과일/곡류 이미지"
+                /></span>
+                <span>치즈/델리/베이커리 </span></a
+              >
+              <ul>
+                <li><a href="#">빵/잼</a></li>
+                <li><a href="#">디저트/케이크</a></li>
+                <li><a href="#">올리브/안티파스토</a></li>
+                <li><a href="#">치즈/버터</a></li>
+                <li><a href="#">델리미트</a></li>
+              </ul>
+            </div>
+            <div class="beauty">
+              <a href="#">
+                <span
+                  ><img src="./images/common/nav09_make-up.png" alt="채소/과일/곡류 이미지"
+                /></span>
+                <span>헬스/뷰티 </span></a
+              >
+              <ul>
+                <li><a href="#">영양제/건강식품</a></li>
+                <li><a href="#">스킨케어</a></li>
+                <li><a href="#">헤어케어</a></li>
+                <li><a href="#">바디케어</a></li>
+                <li><a href="#">구강케어</a></li>
+              </ul>
+            </div>
+            <div class="living">
+              <a href="#">
+                <span
+                  ><img src="./images/common/nav10_living.png" alt="채소/과일/곡류 이미지"
+                /></span>
+                <span>리빙 </span></a
+              >
+              <ul>
+                <li><a href="#">주방용품</a></li>
+                <li><a href="#">테이블웨어</a></li>
+                <li><a href="#">세제/생활용품</a></li>
+                <li><a href="#">홈데코</a></li>
+              </ul>
+            </div>
+            <div class="baby">
+              <a href="#">
+                <span><img src="./images/common/nav11_baby.png" alt="채소/과일/곡류 이미지"/></span>
+                <span>유아동 </span></a
+              >
+              <ul>
+                <li><a href="#">기저귀</a></li>
+                <li><a href="#">물티슈/스킨케어</a></li>
+                <li><a href="#">식기/유아용품</a></li>
+                <li><a href="#">분유/이유식</a></li>
+                <li><a href="#">유아식/반찬</a></li>
+                <li><a href="#">간식</a></li>
+              </ul>
+            </div>
+            <div class="brandStore">
+              <a href="#">
+                <span
+                  ><img src="./images/common/nav12_shoppingbag.png" alt="채소/과일/곡류 이미지"
+                /></span>
+                <span>브랜드관 </span></a
+              >
+              <ul>
+                <li><a href="#">일상소</a></li>
+                <li><a href="#">조선호텔</a></li>
+                <li><a href="#">컬리가 만든 요리</a></li>
+                <li><a href="#">치즈룸 안단테</a></li>
+                <li><a href="#">콜린스그린</a></li>
+              </ul>
+            </div>
+            <div class="MDcuration">
+              <a href="#">
+                <span><img src="./images/common/nav13_MD.png" alt="채소/과일/곡류 이미지"/></span>
+                <span>MD의 큐레이션 </span></a
+              >
+              <ul>
+                <li><a href="#">kurly's Gourmet</a></li>
+                <li><a href="#">유기농 식탁</a></li>
+                <li><a href="#">신년 파스타 모임</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <!-- // sub menu -->
+        <div class="navLeft">
+          <div id="sideSearch">
+            <!--<label for="textBox"></label>-->
+            <input
+              type="text"
+              id="textBox"
+              name="textBox"
+              class="searchField"
+              placeholder="생필품 "
+            />
+            <input type="image" src="images/common/search.png" class="btn_search" alt="검색" />
+          </div>
+        </div>
+      </div>
+    </nav>
+    <!-- //navigation -->
+    <!-- mainVisual -->
+    <section id="mainVisual">
+      <h2>메인 배너</h2>
+      <div class="Wrap">
+        <ul class="bxslider">
+          <li>
+            <a href="#"><img src="images/main/mainVisual01.jpg" alt="bannerImage 1"/></a>
+          </li>
+          <li>
+            <a href="#"><img src="images/main/mainVisual02.jpg" alt="bannerImage 2"/></a>
+          </li>
+          <li>
+            <a href="#"><img src="images/main/mainvisual03.jpg" alt="bannerImage 3"/></a>
+          </li>
+        </ul>
+      </div>
+    </section>
+    <!-- // mainVisual -->
+    <!-- contents -->
+    <section id="contents">
+      <div id="quickTop"><i class="fa fa-angle-up"></i><br />top</div>
+      <!-------------- content01 ------------------>
+      <article class="Wrap content01">
+        <h2>최근 등록된 상품</h2>
+        <div>
+          <ul class="mdRecommand">
+            <li>
+              <div>
+                <a href="detail.html"
+                  ><img src="./images/main/MD_01.jpg" alt="일본모찌 4종" />
+                  <span
+                    ><i class="fa fa-search-plus"></i><br />
+                    더보기
+                  </span></a
+                >
+              </div>
+              <div>
+                <p>[우사기] 일본 모찌 4종 <br />4,900원</p>
+              </div>
+            </li>
+            <li>
+              <div>
+                <a href="#"
+                  ><img src="./images/main/MD_02.jpg" alt="유기축산 한우 국거리용(냉장)" />
+                  <span
+                    ><i class="fa fa-search-plus"></i><br />
+                    더보기
+                  </span></a
+                >
+              </div>
+              <div>
+                <p>[네이처오다] 유기축산 한우 국거리용 (냉장)<br />19,900원</p>
+              </div>
+            </li>
+            <li>
+              <div>
+                <a href="#"
+                  ><img src="./images/main/MD_03.jpg" alt="프리미엄 4겹 화장지 30롤" />
+                  <span
+                    ><i class="fa fa-search-plus"></i><br />
+                    더보기
+                  </span></a
+                >
+              </div>
+              <div>
+                <p>[파세오] 프리미엄 4겹 화장지 30롤 <br />23,900원</p>
+              </div>
+            </li>
+            <li>
+              <div>
+                <a href="#"
+                  ><img src="./images/main/MD_04.jpg" alt="카레 계란간장" />
+                  <span
+                    ><i class="fa fa-search-plus"></i><br />
+                    더보기
+                  </span></a
+                >
+              </div>
+              <div>
+                <p>[쇼다] 카레 계란간장 <br />4,900원</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </article>
+      <!-- //content01 -->
+      <!-- content02 -->
+      <article class="Wrap content01">
+        <h2>인기 업체</h2>
+        <div>
+          <ul class="mdRecommand">
+            <li>
+              <div>
+                <a href="detail.html"
+                  ><img src="./images/main/MD_01.jpg" alt="일본모찌 4종" />
+                  <span
+                    ><i class="fa fa-search-plus"></i><br />
+                    더보기
+                  </span></a
+                >
+              </div>
+              <div>
+                <p>[우사기] 일본 모찌 4종 <br />4,900원</p>
+              </div>
+            </li>
+            <li>
+              <div>
+                <a href="#"
+                  ><img src="./images/main/MD_02.jpg" alt="유기축산 한우 국거리용(냉장)" />
+                  <span
+                    ><i class="fa fa-search-plus"></i><br />
+                    더보기
+                  </span></a
+                >
+              </div>
+              <div>
+                <p>[네이처오다] 유기축산 한우 국거리용 (냉장)<br />19,900원</p>
+              </div>
+            </li>
+            <li>
+              <div>
+                <a href="#"
+                  ><img src="./images/main/MD_03.jpg" alt="프리미엄 4겹 화장지 30롤" />
+                  <span
+                    ><i class="fa fa-search-plus"></i><br />
+                    더보기
+                  </span></a
+                >
+              </div>
+              <div>
+                <p>[파세오] 프리미엄 4겹 화장지 30롤 <br />23,900원</p>
+              </div>
+            </li>
+            <li>
+              <div>
+                <a href="#"
+                  ><img src="./images/main/MD_04.jpg" alt="카레 계란간장" />
+                  <span
+                    ><i class="fa fa-search-plus"></i><br />
+                    더보기
+                  </span></a
+                >
+              </div>
+              <div>
+                <p>[쇼다] 카레 계란간장 <br />4,900원</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </article>
+      <!-- //content02 -->
+    </section>
+    <!-- footer -->
+    <footer>
+      <div class="Wrap">
+        <div></div>
+        <div>
+          <ul class="footerLeft">
+            <li><a href="#">컬리소개</a></li>
+            <li><a href="#">컬리영상소개</a></li>
+            <li><a href="#">이용안내</a></li>
+            <li><a href="#">이용약관</a></li>
+            <li><a href="#">개인정보처리방침</a></li>
+          </ul>
+          <ul class="footerRight">
+            <li><a href="https://ko-kr.facebook.com/marketkurly/" target="_blank"></a></li>
+            <li><a href="https://www.instagram.com/marketkurly/?hl=ko" target="_blank"></a></li>
+            <li><a href="https://blog.naver.com/marketkurly" target="_blank"></a></li>
+          </ul>
+        </div>
+        <div>
+          <img src="./images/main/sodam-logo.png" alt="컬리 풋터로고" />
+          <dl>
+            <dt>법인명(상호) &nbsp;</dt>
+            <dd class="dispBlock">&nbsp;주식회사 소담마켓</dd>
+            <dt>대표자(성명) &nbsp;</dt>
+            <dd class="dispBlock">&nbsp;설예지 대표</dd>
+            <dt>개인정보보호책임자 &nbsp;</dt>
+            <dd>&nbsp;정재만 (help@kurlycorp.com)</dd>
+          </dl>
+          <dl>
+            <dt class="dispBlock">사업자등록번호 &nbsp;</dt>
+            <dd class="dispBlock">&nbsp;261-81-????[사업자정보확인]</dd>
+            <dt>통신판매업 &nbsp;</dt>
+            <dd>&nbsp; 제 2017-서울중구-????호</dd>
+          </dl>
+          <dl>
+            <dt>입점문의 &nbsp;</dt>
+            <dd class="fontColor">&nbsp; 입점문의하기</dd>
+            <dt>마케팅제휴 &nbsp;</dt>
+            <dd>&nbsp;_marketing@kurlycorp.com</dd>
+            <dt>채용문의&nbsp;</dt>
+            <dd>&nbsp; _recruit@kutlycorp.com</dd>
+            <dt>팩스 &nbsp;</dt>
+            <dd>&nbsp;070-7500-????</dd>
+          </dl>
+          <dl>
+            <dt>주소 &nbsp;</dt>
+            <dd class="dispBlock">&nbsp;서울특별시 중구 삼일대로 ???,14층</dd>
+          </dl>
+          <address>&copy; market kurly all right reserved.</address>
+        </div>
+      </div>
+    </footer>
+    <!-- // footer -->
+    <!--login popup-->
+    <section id="loginWrapper">
+      <div id="login_bg"></div>
+      <div id="login_main">
+        <div id="loginClose"><img src="./images/common/nav-close.png" alt="로그인 닫기" /></div>
+        <form method="post" action="login.php">
+          <fieldset>
+            <legend>로그인</legend>
+            <input placeholder="  아이디" /><br />
+            <input placeholder="  비밀번호" />
+          </fieldset>
+        </form>
+        <div class="loginbtnWrapper">
+          <button type="submit" id="btnLogin">로그인</button><br />
+          <button type="submit" id="btnJoin">회원가입</button>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

@@ -32,6 +32,7 @@ type Post struct {
 	SpoilerOf  *string   `json:"spoiler_of,"`
 	NSFW       bool      `json:"nsfw,"`
 	LikesCount int       `json:"likesCount,"`
+	CommentsCount int	 `json:"commentsCount"`
 	CreatedAt  time.Time `json:"created_at,"`
 	User       *User     `json:"user,omitempty"`
 	Mine       bool      `json:"mine,"`
@@ -171,7 +172,7 @@ func (s *Service) Posts(
 	last = normailizePageSize(last)
 
 	query, args, err := buildQuery(`
-		SELECT id, content, spoiler_of, nsfw, likes_count, created_at
+		SELECT id, content, spoiler_of, nsfw, likes_count, comments_count, created_at
 		{{if .auth}}
 		, posts.user_id = @uid AS mine
 		, likes.user_id IS NOT NULL AS liked
@@ -206,7 +207,7 @@ func (s *Service) Posts(
 	pp := make([]Post, 0, last)
 	for rows.Next() {
 		var p Post
-		dest := []interface{}{&p.ID, &p.Content, &p.SpoilerOf, &p.NSFW, &p.LikesCount, &p.CreatedAt}
+		dest := []interface{}{&p.ID, &p.Content, &p.SpoilerOf, &p.NSFW, &p.LikesCount, &p.CommentsCount, &p.CreatedAt}
 		if auth {
 			dest = append(dest, &p.Mine, &p.Liked)
 		}
@@ -234,7 +235,7 @@ func (s *Service) Post(ctx context.Context, postID int64) (Post, error) {
 	var p Post
 	uid, auth := ctx.Value(KeyAuthUserID).(int64)
 	query, args, err := buildQuery(`
-		SELECT posts.id, content, spoiler_of, nsfw, likes_count, created_at
+		SELECT posts.id, content, spoiler_of, nsfw, likes_count, comments_count, created_at
 		, users.username, users.avatar
 		{{if .auth}}
 		, posts.user_id = @uid AS mine
@@ -258,7 +259,7 @@ func (s *Service) Post(ctx context.Context, postID int64) (Post, error) {
 
 	var u User
 	var avatar sql.NullString
-	dest := []interface{}{&p.ID, &p.Content, &p.SpoilerOf, &p.NSFW, &p.LikesCount, &p.CreatedAt, &u.UserName, &avatar}
+	dest := []interface{}{&p.ID, &p.Content, &p.SpoilerOf, &p.NSFW, &p.LikesCount, &p.CommentsCount, &p.CreatedAt, &u.UserName, &avatar}
 	if auth {
 		dest = append(dest, &p.Mine, &p.Liked)
 	}

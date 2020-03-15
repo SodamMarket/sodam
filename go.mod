@@ -9,6 +9,7 @@ require (
 	github.com/jackc/fake v0.0.0-20150926172116-812a484cc733 // indirect
 	github.com/jackc/pgconn v1.3.2
 	github.com/jackc/pgx v3.6.2+incompatible
+	github.com/lib/pq v1.2.0
 	github.com/matoous/go-nanoid v1.2.0
 	github.com/matryer/way v0.0.0-20180416093233-9632d0c407b0
 	github.com/sanity-io/litter v1.2.0

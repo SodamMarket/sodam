@@ -1,0 +1,50 @@
+@charset "utf-8";
+* {padding:0; margin:0;}
+ol,li {list-style:none;}
+a {text-decoration:none;}
+img {vertical-align:top;}
+
+/* 공통 */
+.Wrap {width:1260px; margin:0 auto; background-color:white;/*background-color:#777;*/}
+h2 {font:25px bold arial,sans-serif;}
+
+
+/* register box */
+
+section > p {padding:20px; font-size:14px;}
+section > p a {color:purple;}
+
+.formWrapper {width:960px; margin:0 auto;}
+.formWrapper form {margin:20px 0 30px 0; }
+form fieldset legend {font-size:20px; padding:20px;}
+
+fieldset table caption {z-index:-9999; position:absolute; width:1px; height:1; overflow:hidden; font-size:0; line-height:0; top:auto;}
+
+fieldset table {border-top:1px solid purple; border-bottom:1px solid purple; }
+fieldset table tr {border-bottom:1px solid #e3e3e5;}
+fieldset table th,fieldset table td {border-bottom:1px solid #e3e3e5;}
+fieldset table th {text-align:center; width:200px; height:60px; background-color:#f8f8f8;}
+fieldset table td {padding:0 200px 0 30px;}
+fieldset table td.padding_none {padding:0 50px;}
+fieldset table .textBox {height:30px; border:1px solid grey; transition:all .5s;}
+fieldset table #addr {width:100px;}
+fieldset table .detailAddr {width:100%;}
+fieldset table tr:nth-child(7) input {margin:5px 0;}
+fieldset table .CheckBox { display:inline-block; font-size:14px; width:100px; height:30px; text-align:center; color:white; background-color:purple; border:0.1px solid #e3e3e5; margin:5px 0;}
+
+fieldset table select {height:30px; }
+
+
+/* 약관 동의 폼 */
+.formWrapper .joinTerms p {margin:10px 0; font-size:14px; color:purple;}
+.formWrapper .terms {width:800px; height:100px; margin:20px auto; border:1px solid purple; overflow: auto; font-size:13px; color:grey; transition:all .5s;}
+
+
+
+/* 버튼 */
+.btnWrapper  {width:310px; margin:0 auto 50px; }
+.btnWrapper button {width:130px; height:40px; margin:0 10px; color:white; background-color:purple; border:0.1px solid #e3e3e5;}
+.btnWrapper button:first-child {background-color:white; color:black;}
+
+
+
