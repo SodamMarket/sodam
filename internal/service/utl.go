@@ -6,7 +6,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/jackc/pgconn"
+	"github.com/lib/pq"
 )
 
 const (
@@ -18,13 +18,13 @@ const (
 var queriesCache = make(map[string]*template.Template)
 
 func isUniqueViolation(err error) bool {
-	pgerr, ok := err.(*pgconn.PgError)
-	return ok && pgerr.Code == "23505"
+	pqerr, ok := err.(*pq.Error)
+	return ok && pqerr.Code == "23505"
 }
 
 func isForeignKeyViolation(err error) bool {
-	pgerr, ok := err.(*pgconn.PgError)
-	return ok && pgerr.Code == "23503"
+	pqerr, ok := err.(*pq.Error)
+	return ok && pqerr.Code == "23503"
 }
 
 //쿼리문을 보충해주는 기능

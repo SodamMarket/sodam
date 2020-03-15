@@ -440,7 +440,7 @@ func (s *Service) ToggleFollow(ctx context.Context, username string) (ToggleFoll
 	// 팔로잉을 끊었을 시 더이상 알림 받지 않음
 	// Dispatch a notification
 	if out.Following {
-		// TODO: notify followw
+		go s.notifyFollow(followerID, followeeID)
 	}
 
 	return out, nil

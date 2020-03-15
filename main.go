@@ -9,7 +9,7 @@ import (
 	"sodam/internal/service"
 
 	"github.com/hako/branca"
-	_ "github.com/jackc/pgx/stdlib"
+	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -20,7 +20,7 @@ func main() {
 		brancaKey   = env("BRANACA_KEY", "supersecretkeyyoushouldnotcommit")
 	)
 
-	db, err := sql.Open("pgx", databaseURL)
+	db, err := sql.Open("postgres", databaseURL)
 	if err != nil {
 		log.Fatalf("could not open db connetion: %v\n", err)
 		return

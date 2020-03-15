@@ -123,6 +123,22 @@ IF NOT EXISTS shopping_basket
 	post_id INT NOT NULL REFERENCES posts
 );
 
+CREATE TABLE
+IF NOT EXISTS notifications
+(
+	id SERIAL NOT NULL PRIMARY KEY,
+	user_id INT NOT NULL REFERENCES users,
+	actors VARCHAR[] NOT NULL,
+	type VARCHAR NOT NULL,
+	read BOOLEAN NOT NULL DEFAULT false,
+	issued_at TIMESTAMP NOT NULL DEFAULT now
+()
+);
+
+CREATE INDEX
+IF NOT EXISTS sorted_notifications ON notifications
+(issued_at DESC);
+
 INSERT INTO users
 	(id, email, username)
 VALUES
